@@ -434,3 +434,9 @@ discovery.zen.ping.unicast.hosts: [{% for member in server.cluster.members %}"{{
 {%- if server.script is mapping %}
 script: {{ server.script|yaml }}
 {%- endif %}
+
+{%- if 'extra_params' in server -%}
+{%- for extra_param_name, extra_param_value in server.extra_params -%}
+{{ extra_param_name }}: {{ extra_param_value }}
+{%- endfor -%}
+{%- endif -%}
