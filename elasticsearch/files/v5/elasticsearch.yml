@@ -436,7 +436,7 @@ script: {{ server.script|yaml }}
 {%- endif %}
 
 {%- if 'extra_params' in server -%}
-{%- for extra_param_name, extra_param_value in server.extra_params -%}
+{% for extra_param_name, extra_param_value in server.extra_params.iteritems() %}
 {{ extra_param_name }}: {{ extra_param_value }}
-{%- endfor -%}
+{% endfor %}
 {%- endif -%}
