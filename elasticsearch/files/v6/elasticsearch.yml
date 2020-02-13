@@ -97,7 +97,7 @@ node.rack: {{ server.rack }}
 
 {%- if server.get('threadpool', {}).get('bulk', {}).queue_size is defined %}
 # For bulk operations. Thread pool type is fixed with a size of # of available processors.
-threadpool.bulk.queue_size: {{ server.threadpool.bulk.queue_size }}
+thread_pool.bulk.queue_size: {{ server.threadpool.bulk.queue_size }}
 {%- endif %}
 
 #################################### Index ####################################
@@ -115,11 +115,11 @@ threadpool.bulk.queue_size: {{ server.threadpool.bulk.queue_size }}
 
 # Set the number of shards (splits) of an index (5 by default):
 #
-index.number_of_shards: {{ server.get('index', {}).get('shards', 5) }}
+#index.number_of_shards: {{ server.get('index', {}).get('shards', 5) }}
 
 # Set the number of replicas (additional copies) of an index (1 by default):
 #
-index.number_of_replicas: {{ server.get('index', {}).get('replicas', 1) }}
+#index.number_of_replicas: {{ server.get('index', {}).get('replicas', 1) }}
 
 # Note, that for development on a local machine, with small indices, it usually
 # makes sense to "disable" the distributed features:
@@ -151,7 +151,7 @@ index.number_of_replicas: {{ server.get('index', {}).get('replicas', 1) }}
 
 #################################### Paths ####################################
 
-# Path to directory containing configuration (this file and logging.yml):
+# Path to directory containing configuration (this file and log4j2.properties):
 #
 # path.conf: /path/to/conf
 
@@ -160,6 +160,8 @@ index.number_of_replicas: {{ server.get('index', {}).get('replicas', 1) }}
 # path.data: /path/to/data
 {%- if server.get('path', {}).data is defined %}
 path.data: {{ server.path.data }}
+{%- else %}
+path.data: /var/lib/elasticsearch
 {%- endif %}
 #
 # Can optionally include more than one location, causing data to be striped across
@@ -176,7 +178,9 @@ path.data: {{ server.path.data }}
 #
 # path.logs: /path/to/logs
 {%- if server.get('path', {}).logs is defined %}
-path.logs = {{ server.path.logs }}
+path.logs: {{ server.path.logs }}
+{%- else %}
+path.logs: /var/log/elasticsearch
 {%- endif %}
 
 # Path to where plugins are installed:
@@ -207,7 +211,7 @@ path.repo:
 #
 # bootstrap.mlockall: true
 {%- if server.mlockall is defined %}
-bootstrap.mlockall: {{ server.mlockall|lower }}
+bootstrap.memory_lock: {{ server.mlockall|lower }}
 {%- endif %}
 
 # Make sure that the ES_MIN_MEM and ES_MAX_MEM environment variables are set
@@ -371,7 +375,7 @@ discovery.zen.minimum_master_nodes: {{ server.get('cluster', {}).minimum_master_
 #
 # 1. Disable multicast discovery (enabled by default):
 #
-discovery.zen.ping.multicast.enabled: {{ server.get('cluster', {}).get('multicast', True)|lower }}
+#discovery.zen.ping.multicast.enabled: {{ server.get('cluster', {}).get('multicast', True)|lower }}
 #
 # 2. Configure an initial list of master nodes in the cluster
 #    to perform discovery when new nodes (master or data) are started:
@@ -434,3 +438,9 @@ discovery.zen.ping.unicast.hosts: [{% for member in server.cluster.members %}"{{
 {%- if server.script is mapping %}
 script: {{ server.script|yaml }}
 {%- endif %}
+
+{%- if 'extra_params' in server -%}
+{% for extra_param_name, extra_param_value in server.extra_params.iteritems() %}
+{{ extra_param_name }}: {{ extra_param_value }}
+{% endfor %}
+{%- endif -%}
