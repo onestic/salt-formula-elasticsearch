@@ -3,6 +3,6 @@
 
 elasticsearch_client_packages:
   pkg.installed:
-  - names: {{ client.pkgs }}
+  - names: {{ client.pkgs | tojson }}
 
 {%- endif %}

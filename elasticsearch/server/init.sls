@@ -8,7 +8,7 @@ include:
 
 elasticsearch_packages:
   pkg.installed:
-  - names: {{ server.pkgs }}
+  - names: {{ server.pkgs | tojson }}
 
 elasticsearch_default:
   file.managed:
@@ -26,21 +26,10 @@ elasticsearch_config:
   - require:
     - pkg: elasticsearch_packages
 
-{%- if server.version == 2 %}
-elasticsearch_logging:
-  file.managed:
-  - name: /etc/elasticsearch/logging.yml
-  - source: salt://elasticsearch/files/v2/logging.yml
-  - template: jinja
-  - require:
-    - pkg: elasticsearch_packages
-{%- endif %}
-
-{%- if server.version == 5 %}
 elasticsearch_logging:
   file.managed:
   - name: /etc/elasticsearch/log4j2.properties
-  - source: salt://elasticsearch/files/v5/log4j2.properties
+  - source: salt://elasticsearch/files/v{{ server.version }}/log4j2.properties
   - template: jinja
   - require:
     - pkg: elasticsearch_packages
@@ -48,7 +37,7 @@ elasticsearch_logging:
 elasticsearch_jvm_options:
   file.managed:
   - name: /etc/elasticsearch/jvm.options
-  - source: salt://elasticsearch/files/v5/jvm.options
+  - source: salt://elasticsearch/files/v{{ server.version }}/jvm.options
   - template: jinja
   - require:
     - pkg: elasticsearch_packages
@@ -98,5 +87,3 @@ elasticsearch_service:
     - file: elasticsearch_config
     - file: elasticsearch_logging
     - file: elasticsearch_default
-
-{%- endif %}
