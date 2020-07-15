@@ -8,7 +8,7 @@ include:
 
 elasticsearch_packages:
   pkg.installed:
-  - names: {{ server.pkgs | tojson }}
+  - names: {{ server.pkgs }}
 
 elasticsearch_default:
   file.managed:
